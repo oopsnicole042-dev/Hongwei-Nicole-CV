@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" data-l="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hongwei (Nicole) Li</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a ledger page — a narrow mono "date column" on the left, entries on the right,
+   faint ledger rules, and an auditor's red tickmark as the one accent. */
+:root{
+  --paper:#f3f5f2;
+  --sheet:#fbfcfa;
+  --ink:#1c2826;
+  --muted:#5b6965;
+  --rule:#d5ddd8;
+  --tick:#b8402f;
+  --font-display:"Bricolage Grotesque","Noto Serif SC",system-ui,sans-serif;
+  --font-body:"Source Serif 4","Noto Serif SC",Georgia,serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121918; --sheet:#17201f; --ink:#e3ebe7; --muted:#9aaba5; --rule:#2b3836; --tick:#e5735f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121918; --sheet:#17201f; --ink:#e3ebe7; --muted:#9aaba5; --rule:#2b3836; --tick:#e5735f;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+html[data-l="en"] .zh, html[data-l="zh"] .en{display:none !important}
+html[data-l="zh"] body{font-family:"Noto Serif SC",var(--font-body)}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+/* top bar */
+.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-bottom:1px solid var(--rule)}
+.bar .mark{font-family:var(--font-mono);font-size:13px;color:var(--muted);letter-spacing:.04em}
+.bar nav{display:flex;flex-wrap:wrap;gap:4px 18px;font-family:var(--font-mono);font-size:13px}
+.bar nav a{color:var(--muted);text-decoration:none}
+.bar nav a:hover{color:var(--ink)}
+.lang{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden}
+.lang button{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;padding:5px 12px;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.lang button:focus-visible{outline:2px solid var(--tick);outline-offset:-2px}
+
+/* hero */
+.hero{padding:64px 0 48px;display:grid;grid-template-columns:1fr;gap:28px}
+.hero h1{
+  font-family:var(--font-display);font-weight:800;
+  font-size:clamp(44px,8vw,96px);line-height:.95;letter-spacing:-.03em;margin:0;text-wrap:balance;
+}
+.hero h1 .cn{display:block;font-family:"Noto Serif SC",serif;font-weight:600;font-size:.42em;letter-spacing:.08em;color:var(--muted);margin-top:14px}
+.thesis{font-family:var(--font-display);font-weight:400;font-size:clamp(21px,2.6vw,28px);line-height:1.3;max-width:30ch;margin:0;text-wrap:balance}
+.thesis em{font-style:normal;background:linear-gradient(transparent 62%, color-mix(in srgb,var(--tick) 22%, transparent) 62%)}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+.facts li{font-family:var(--font-mono);font-size:13px;border:1px solid var(--rule);background:var(--sheet);padding:6px 12px;border-radius:4px}
+
+/* sections as ledger */
+section{border-top:2px solid var(--ink);padding:28px 0 40px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px}
+.sec-head h2{font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin:0}
+html[data-l="zh"] .sec-head h2{letter-spacing:.3em;font-family:"Noto Serif SC",serif}
+.sec-head .ref{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+
+.row{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:18px 0;border-bottom:1px dashed var(--rule)}
+.row:last-child{border-bottom:0}
+.when{font-family:var(--font-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:3px}
+.what h3{font-family:var(--font-display);font-weight:600;font-size:20px;line-height:1.3;margin:0 0 2px;text-wrap:balance}
+html[data-l="zh"] .what h3{font-family:"Noto Serif SC",serif}
+.what .org{color:var(--muted);margin:0 0 8px;font-size:15px}
+.what p{margin:0 0 8px;max-width:65ch}
+
+ul.ticks{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;max-width:68ch}
+ul.ticks li{position:relative;padding-left:26px}
+ul.ticks li::before{
+  content:"";position:absolute;left:2px;top:.45em;width:14px;height:10px;
+  background:var(--tick);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10'%3E%3Cpath d='M1 5.5 L5 9 L13 1' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10'%3E%3Cpath d='M1 5.5 L5 9 L13 1' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain;
+}
+
+/* research focus cards */
+.focus{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px}
+.focus div{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--tick);padding:16px 18px}
+.focus h3{font-family:var(--font-display);font-weight:600;font-size:18px;margin:0 0 6px}
+html[data-l="zh"] .focus h3{font-family:"Noto Serif SC",serif}
+.focus p{margin:0;font-size:15px;color:var(--muted)}
+
+.papers{list-style:none;margin:0;padding:0}
+.papers li{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:14px 0;border-bottom:1px dashed var(--rule)}
+.papers li:last-child{border-bottom:0}
+.role{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--tick);padding-top:4px}
+.papers .t{font-weight:600}
+.papers .s{color:var(--muted);font-size:15px;display:block}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px 40px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 16px;margin:0}
+.kv dt{font-family:var(--font-mono);font-size:13px;color:var(--muted);padding-top:3px}
+.kv dd{margin:0}
+
+.contact{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.contact .addr{font-family:var(--font-mono);font-size:17px;color:var(--ink)}
+.contact a{color:var(--ink)}
+.copy{font-family:var(--font-mono);font-size:13px;background:var(--ink);color:var(--sheet);border:0;border-radius:4px;padding:8px 14px;cursor:pointer}
+.copy:focus-visible{outline:2px solid var(--tick);outline-offset:2px}
+footer{padding:24px 0 48px;color:var(--muted);font-family:var(--font-mono);font-size:12px;border-top:1px solid var(--rule)}
+
+/* load moment: tickmarks draw in once */
+@media (prefers-reduced-motion: no-preference){
+  .hero h1, .thesis, .facts{animation:rise .7s ease-out both}
+  .thesis{animation-delay:.08s}.facts{animation-delay:.16s}
+  @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+}
+
+@media (max-width:760px){
+  .focus{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .bar nav{display:none}
+}
+@media (max-width:560px){
+  .row,.papers li{grid-template-columns:1fr;gap:4px}
+  .kv{grid-template-columns:1fr;gap:2px}
+  .kv dd{margin-bottom:10px}
+  .hero{padding-top:40px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="bar">
+    <span class="mark">H. Li · <span class="en">Auditing · Compliance · Internal Control</span><span class="zh">审计 · 合规 · 内部控制</span></span>
+    <nav aria-label="Sections">
+      <a href="#research"><span class="en">Research</span><span class="zh">研究</span></a>
+      <a href="#experience"><span class="en">Experience</span><span class="zh">经历</span></a>
+      <a href="#education"><span class="en">Education</span><span class="zh">教育</span></a>
+      <a href="#contact"><span class="en">Contact</span><span class="zh">联系</span></a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="btn-en" aria-pressed="true">EN</button>
+      <button type="button" id="btn-zh" aria-pressed="false">中文</button>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1>Hongwei (Nicole) Li<span class="cn">李虹玮</span></h1>
+    <p class="thesis en">I study how <em>compliance systems, internal control and regulatory enforcement</em> change the way firms behave and report.</p>
+    <p class="thesis zh">我研究<em>合规体系、内部控制与监管执法</em>如何改变企业的经营行为与财务报告。</p>
+    <ul class="facts">
+      <li class="en">PhD candidate, Auditing · ZUEL</li><li class="zh">审计学博士在读 · 中南财经政法大学</li>
+      <li class="en">Master of Business (Professional Accounting) · QUT</li><li class="zh">工商管理硕士（专业会计方向）· 昆士兰科技大学</li>
+      <li class="en">Chinese · English</li><li class="zh">中文 · 英语</li>
+      <li class="en">Based in Wuhan, China</li><li class="zh">现居湖北武汉</li>
+    </ul>
+  </div>
+
+  <section id="about">
+    <div class="sec-head"><h2><span class="en">Profile</span><span class="zh">个人简介</span></h2></div>
+    <p class="en" style="max-width:65ch;margin:0">PhD candidate in Auditing at Zhongnan University of Economics and Law. My research evaluates regulatory and policy interventions with quasi-experimental methods (staggered difference-in-differences, event studies) using hand-collected and large-scale firm data. I trained as an accountant in Australia and worked at a Melbourne accounting firm on reconciliations, accounts payable, supplier records and tax-authority liaison. I work in Chinese and English and have studied, worked and volunteered in multicultural settings.</p>
+    <p class="zh" style="max-width:65ch;margin:0">中南财经政法大学审计学博士在读。研究运用交错双重差分、事件研究等准实验方法，基于手工收集与大样本企业数据，评估监管与政策干预的效果。在澳大利亚接受系统会计训练，并在墨尔本会计师事务所从事对账、应付账款、供应商信息维护及与税务机关对接等实务工作。可使用中英文工作，具有在多元文化环境中学习、工作和志愿服务的经历。</p>
+  </section>
+
+  <section id="research">
+    <div class="sec-head"><h2><span class="en">Research</span><span class="zh">研究</span></h2><span class="ref"><span class="en">all papers under review</span><span class="zh">论文均在投</span></span></div>
+
+    <div class="focus">
+      <div>
+        <h3><span class="en">Integrity &amp; compliance</span><span class="zh">诚信与合规</span></h3>
+        <p class="en">Compliance management systems (ISO 37301), internal control, regulatory enforcement and deterrence.</p>
+        <p class="zh">企业合规管理体系（ISO 37301）、内部控制、监管执法与威慑效应。</p>
+      </div>
+      <div>
+        <h3><span class="en">Reporting quality</span><span class="zh">财务报告质量</span></h3>
+        <p class="en">Earnings management, financial reporting quality and corporate governance.</p>
+        <p class="zh">盈余管理、财务报告质量与公司治理。</p>
+      </div>
+      <div>
+        <h3><span class="en">Policy evaluation</span><span class="zh">政策评估</span></h3>
+        <p class="en">Staggered DID, event studies and CSDID in Stata; data work in Python.</p>
+        <p class="zh">基于 Stata 的交错 DID、事件研究与 CSDID；Python 数据处理。</p>
+      </div>
+    </div>
+
+    <ul class="papers">
+      <li>
+        <span class="role"><span class="en">Sole author</span><span class="zh">独立作者</span></span>
+        <span><span class="t en">ISO 37301 compliance management system certification, compliance-related internal control and real earnings management</span><span class="t zh">《合规管理体系认证、合规内部控制与真实盈余管理》</span>
+        <span class="s en">Hand-collected certification data; DID, event-study and CSDID designs.</span><span class="s zh">以 ISO 37301 认证为研究对象，手工收集认证数据，运用 DID、事件研究、CSDID 等方法。</span></span>
+      </li>
+      <li>
+        <span class="role"><span class="en">Corresponding author</span><span class="zh">通讯作者</span></span>
+        <span><span class="t">Deterred or taught? Chief financial officers' adverse experiences, numerical conformity, and earnings management</span>
+        <span class="s en">Project administration; review and editing.</span><span class="s zh">负责项目管理与论文审阅修改。</span></span>
+      </li>
+      <li>
+        <span class="role"><span class="en">Second author</span><span class="zh">第二作者</span></span>
+        <span><span class="t en">Enterprise internationalization and total factor productivity: mechanisms and pathways</span><span class="t zh">《企业国际化与全要素生产率提升：影响机理及路径研究》</span></span>
+      </li>
+      <li>
+        <span class="role"><span class="en">Second author</span><span class="zh">第二作者</span></span>
+        <span><span class="t en">Brokerage continuous supervision and analyst forecast accuracy</span><span class="t zh">《券商持续督导与分析师预测准确性》</span></span>
+      </li>
+    </ul>
+
+    <div class="row" style="margin-top:8px;border-top:1px dashed var(--rule)">
+      <div class="when">2025</div>
+      <div class="what">
+        <h3><span class="en">Wuhan Social Science Fund project (municipal level)</span><span class="zh">武汉市社科基金后期资助项目（市级）</span></h3>
+        <p class="org en">Computing power deployment and firms' new quality productive forces · Participant</p>
+        <p class="org zh">《算力部署赋能企业新质生产力提升的机制、效应及政策优化研究》· 参与</p>
+        <ul class="ticks">
+          <li class="en">Studies how computing infrastructure deployment affects firm productivity and how related policy can be improved</li>
+          <li class="zh">研究算力等数字基础设施部署对企业生产率的影响及政策优化路径</li>
+          <li class="en">Data curation and processing; empirical analysis in Stata</li>
+          <li class="zh">负责数据收集与处理，基于 Stata 完成实证分析</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="when">2025.10 – 2026.02</div>
+      <div class="what">
+        <h3><span class="en">Research Team Lead</span><span class="zh">科研小组负责人</span></h3>
+        <p class="org en">Zhongnan University of Economics and Law</p>
+        <p class="org zh">中南财经政法大学</p>
+        <ul class="ticks">
+          <li class="en">Led a 15-member graduate team building a toolkit of psychological, behavioural and social-science theories used in leading accounting and finance journals (The Accounting Review, Contemporary Accounting Research, Journal of Accounting and Economics), as a resource for research students</li>
+          <li class="zh">带领 15 人研究生科研小组，系统梳理 TAR、CAR、JAE 等财会金融国际顶刊中使用的心理学、行为学及人文社科理论，编制面向研究生的科研理论工具库</li>
+          <li class="en">Coordinated task allocation and progress; organised the literature in Mendeley</li>
+          <li class="zh">负责任务分工与进度协调，使用 Mendeley 统一整理文献</li>
+          <li class="en">Prepared presentation materials and meeting minutes for supervisor and research group</li>
+          <li class="zh">为导师及课题组整理汇报材料、撰写会议纪要</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-head"><h2><span class="en">Experience</span><span class="zh">工作与实习经历</span></h2></div>
+
+    <div class="row">
+      <div class="when">2024.01 – 2024.08</div>
+      <div class="what">
+        <h3><span class="en">General Accountant Intern · Accounting Intern</span><span class="zh">General Accountant 实习生 · 会计实习生</span></h3>
+        <p class="org en">LGY Accountants Pty Ltd, Melbourne, Australia</p>
+        <p class="org zh">LGY Accountants Pty Ltd（澳大利亚墨尔本，会计师事务所）</p>
+        <ul class="ticks">
+          <li class="en">Kept complete and accurate financial records for multiple SME clients in Xero, MYOB, QuickBooks and Reckon</li>
+          <li class="zh">使用 Xero、MYOB、QuickBooks、Reckon 为多家中小企业客户维护完整、准确的财务记录</li>
+          <li class="en">Month-end bank and general-ledger reconciliations, discrepancy investigation, accruals and adjusting journals; financial statements to trial balance</li>
+          <li class="zh">执行月末银行对账与总账核对，跟进差异；处理计提与调整分录，协助编制财务报表至试算平衡</li>
+          <li class="en">Accounts receivable and payable, supplier records, payroll through Single Touch Payroll</li>
+          <li class="zh">负责应收应付、供应商信息维护，通过 STP 完成薪酬申报</li>
+          <li class="en">Automated month-end reconciliation with Excel templates; built a multi-department dashboard of key indicators</li>
+          <li class="zh">以 Excel 模板实现月末对账自动化，并搭建多部门关键财务指标仪表盘</li>
+          <li class="en">Liaison between clients and the Australian Taxation Office</li>
+          <li class="zh">作为客户与澳大利亚税务局的沟通窗口</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="when">2023.02 – 2023.08</div>
+      <div class="what">
+        <h3><span class="en">Founder and Operator, Food Business</span><span class="zh">澳洲餐饮自主创业 · 经营者</span></h3>
+        <p class="org en">Sole trader, Australia</p>
+        <p class="org zh">个体经营，澳大利亚</p>
+        <ul class="ticks">
+          <li class="en">Set up a weekend food truck and online ordering service: market research, feasibility, licensing and a risk management plan</li>
+          <li class="zh">从零搭建周末餐车与线上订餐业务：市场调研、可行性评估、营业与食品许可、风险管理计划</li>
+          <li class="en">Ran procurement, inventory and delivery logistics; tracked costs, pricing and return on investment</li>
+          <li class="zh">负责采购、库存与配送物流，跟踪成本、定价与投资回报</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="when">2020.05 – 2020.07</div>
+      <div class="what">
+        <h3><span class="en">IT Department Intern</span><span class="zh">信息技术部实习生</span></h3>
+        <p class="org en">Century Super Star Information Technology Development Co., Ltd., China</p>
+        <p class="org zh">北京世纪超星信息技术发展有限责任公司</p>
+        <ul class="ticks">
+          <li class="en">Produced online course (MOOC) content and trained teachers in digital teaching software</li>
+          <li class="zh">参与慕课内容制作，为教师提供数字化教学软件培训</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="volunteering">
+    <div class="sec-head"><h2><span class="en">Volunteering &amp; International Engagement</span><span class="zh">志愿服务与国际交流</span></h2></div>
+    <div class="row">
+      <div class="when">2026</div>
+      <div class="what">
+        <h3><span class="en">Volunteer, Guest Reception and Event Coordination</span><span class="zh">志愿者（嘉宾接待与会务协调）</span></h3>
+        <p class="org en">2026 Tencent Developer Conference</p>
+        <p class="org zh">2026 腾讯开发者大会</p>
+        <ul class="ticks">
+          <li class="en">Received international guests in English, mainly delegates from Tencent's partners in Asian countries</li>
+          <li class="zh">使用英语接待外籍嘉宾，主要为腾讯合作方的亚洲国家嘉宾</li>
+          <li class="en">When the real-time translation QR code failed, escalated to the technical team and reassured guests until live translation appeared on the main screen</li>
+          <li class="zh">实时翻译二维码失效时，第一时间报备技术部门并安抚嘉宾，说明主屏幕将同步显示实时翻译</li>
+          <li class="en">Supported main-venue coordination with organisers and venue teams</li>
+          <li class="zh">协助主会场会务协调，与主办方及场馆团队对接</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="when">2019.02</div>
+      <div class="what">
+        <h3><span class="en">International Volunteer</span><span class="zh">国际志愿者</span></h3>
+        <p class="org en">Conservation Volunteers Australia, Melbourne</p>
+        <p class="org zh">Conservation Volunteers Australia（澳大利亚墨尔本）</p>
+        <ul class="ticks">
+          <li class="en">Ecological conservation projects at La Trobe Wildlife Sanctuary and Pipemakers Park; awarded a project certificate</li>
+          <li class="zh">参与 La Trobe Wildlife Sanctuary 与 Pipemakers Park 生态保护项目，获项目证书</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="sec-head"><h2><span class="en">Education</span><span class="zh">教育背景</span></h2></div>
+    <div class="row">
+      <div class="when">2025.09 – 2029.06</div>
+      <div class="what">
+        <h3><span class="en">PhD Candidate in Auditing</span><span class="zh">审计学 博士在读</span></h3>
+        <p class="org en">Zhongnan University of Economics and Law, Wuhan</p>
+        <p class="org zh">中南财经政法大学</p>
+        <p class="en">Academic Scholarship (Third Class), 2025 and 2026</p>
+        <p class="zh">2025、2026 年度学业奖学金（三等）</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="when">2022.07 – 2024.11</div>
+      <div class="what">
+        <h3><span class="en">Master of Business (Professional Accounting)</span><span class="zh">工商管理硕士（专业会计方向）</span></h3>
+        <p class="org en">Queensland University of Technology, Brisbane</p>
+        <p class="org zh">昆士兰科技大学（澳大利亚布里斯班）</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="when">2016.09 – 2020.06</div>
+      <div class="what">
+        <h3><span class="en">Bachelor of Accounting</span><span class="zh">会计学 学士</span></h3>
+        <p class="org en">Guangxi University of Finance and Economics, Nanning</p>
+        <p class="org zh">广西财经学院</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head"><h2><span class="en">Skills &amp; Languages</span><span class="zh">技能与语言</span></h2></div>
+    <div class="two">
+      <dl class="kv">
+        <dt><span class="en">Chinese</span><span class="zh">中文</span></dt><dd><span class="en">Native</span><span class="zh">母语</span></dd>
+        <dt><span class="en">English</span><span class="zh">英语</span></dt><dd><span class="en">Fluent · CET-6, IELTS, PTE</span><span class="zh">流利，可作为工作语言 · 六级、IELTS、PTE</span></dd>
+        <dt>ACCA</dt><dd><span class="en">9 papers (Applied Knowledge and Applied Skills)</span><span class="zh">基础阶段 9 门（Applied Knowledge 与 Applied Skills）</span></dd>
+      </dl>
+      <dl class="kv">
+        <dt><span class="en">Data</span><span class="zh">数据分析</span></dt><dd>Stata, Python, Excel, Power BI</dd>
+        <dt><span class="en">Accounting</span><span class="zh">财务系统</span></dt><dd><span class="en">Xero, MYOB, QuickBooks, Reckon, Yonyou</span><span class="zh">Xero、MYOB、QuickBooks、Reckon、用友</span></dd>
+        <dt><span class="en">Training</span><span class="zh">培训</span></dt><dd><span class="en">EY Audit Job Simulation (Forage), 2026</span><span class="zh">安永审计虚拟实习（Forage），2026</span></dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="sec-head"><h2><span class="en">Contact</span><span class="zh">联系方式</span></h2></div>
+    <div class="contact">
+      <a class="addr" href="mailto:nicolelee0402w@gmail.com">nicolelee0402w@gmail.com</a>
+      <button class="copy" type="button" id="copy-email"><span class="en">Copy email</span><span class="zh">复制邮箱</span></button>
+      <span id="copy-status" role="status" style="font-family:var(--font-mono);font-size:13px;color:var(--muted)"></span>
+    </div>
+  </section>
+
+  <footer><span class="en">Hongwei (Nicole) Li · References available upon request</span><span class="zh">李虹玮 · 推荐人信息可应要求提供</span></footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement, en=document.getElementById('btn-en'), zh=document.getElementById('btn-zh');
+  function set(l){
+    root.setAttribute('data-l',l);
+    root.setAttribute('lang', l==='zh' ? 'zh-CN' : 'en');
+    en.setAttribute('aria-pressed', l==='en'); zh.setAttribute('aria-pressed', l==='zh');
+    try{localStorage.setItem('nl-lang',l)}catch(e){}
+  }
+  var saved=null; try{saved=localStorage.getItem('nl-lang')}catch(e){}
+  if(location.hash==='#zh') saved='zh';
+  set(saved==='zh'?'zh':'en');
+  en.addEventListener('click',function(){set('en')});
+  zh.addEventListener('click',function(){set('zh')});
+
+  var btn=document.getElementById('copy-email'), st=document.getElementById('copy-status');
+  btn.addEventListener('click',function(){
+    var zhOn=root.getAttribute('data-l')==='zh';
+    try{
+      navigator.clipboard.writeText('nicolelee0402w@gmail.com').then(function(){
+        st.textContent= zhOn?'已复制':'Copied';
+      },function(){ st.textContent= zhOn?'无法复制，请手动选择':'Could not copy — select the address above'; });
+    }catch(e){ st.textContent= zhOn?'无法复制，请手动选择':'Could not copy — select the address above'; }
+  });
+})();
+</script>
+</body>
+</html>
